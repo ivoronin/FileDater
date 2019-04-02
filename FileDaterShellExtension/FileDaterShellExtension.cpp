@@ -13,9 +13,8 @@ std::wstring GetShellExtensionGUIDString() {
 
 	/* Convert GUID to string */
 	hResult = StringFromCLSID(CLSID_FileDaterShellExtension, &wszGUIDString);
-	if (hResult != S_OK) {
+	if (hResult != S_OK)
 		return NULL;
-	}
 	return std::wstring(wszGUIDString);
 }
 
@@ -58,7 +57,6 @@ HRESULT __stdcall DllRegisterServer() {
 	LSTATUS lStatus;
 
 	wchar_t dllPath[MAX_PATH];
-	DWORD length;
 	std::wstring lpGUIDString, lpGUIDKey, lpHandlerKey;
 	wchar_t wszApartment[] = L"Apartment";
 
@@ -67,10 +65,8 @@ HRESULT __stdcall DllRegisterServer() {
 	 */
 
 	 /* Get dll path */
-	length = GetModuleFileName(g_hModule, dllPath, MAX_PATH);
-	if (length == 0) {
+	if (GetModuleFileName(g_hModule, dllPath, MAX_PATH) == 0)
 		return E_UNEXPECTED;
-	}
 
 	lpGUIDString = GetShellExtensionGUIDString();
 
@@ -81,60 +77,50 @@ HRESULT __stdcall DllRegisterServer() {
 
 	/* Create HKEY_LOCAL_MACHINE\Software\Classes\CLSID\{GUID}\ key */
 	lStatus = RegCreateKeyEx(HKEY_LOCAL_MACHINE, lpGUIDKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkGUID, NULL);
-	if (lStatus != ERROR_SUCCESS) {
-		MessageBox(NULL, L"RegCreateKeyEx error", L"Error", MB_OK);
+	if (lStatus != ERROR_SUCCESS)
 		return E_UNEXPECTED;
-	}
 
 	/* Create InProcServer32 subkey */
 	lStatus = RegCreateKeyEx(hkGUID, L"InProcServer32", 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkInprocServer32, NULL);
-	if (lStatus != ERROR_SUCCESS) {
+	if (lStatus != ERROR_SUCCESS)
 		return E_UNEXPECTED;
-	}
 
 	/* Close GUID key */
 	lStatus = RegCloseKey(hkGUID);
-	if (lStatus != ERROR_SUCCESS) {
+	if (lStatus != ERROR_SUCCESS)
 		return E_UNEXPECTED;
-	}
 
 	/* Set value for InProcServer32 default subkey */
 	lStatus = RegSetValueEx(hkInprocServer32, NULL, 0, REG_SZ, (BYTE*)&dllPath, wcslenb(dllPath));
-	if (lStatus != ERROR_SUCCESS) {
+	if (lStatus != ERROR_SUCCESS)
 		return E_UNEXPECTED;
-	}
 
 	/* Set value for InProcServer32 ThreadingModel subkey */
 	lStatus = RegSetValueEx(hkInprocServer32, L"ThreadingModel", 0, REG_SZ, (BYTE*)&wszApartment, wcslenb(wszApartment));
-	if (lStatus != ERROR_SUCCESS) {
+	if (lStatus != ERROR_SUCCESS)
 		return E_UNEXPECTED;
-	}
 
 	/* Close InProcServer32 subkey */
 	lStatus = RegCloseKey(hkInprocServer32);
-	if (lStatus != ERROR_SUCCESS) {
+	if (lStatus != ERROR_SUCCESS)
 		return E_UNEXPECTED;
-	}
 
 	/* Create handler key */
 	lpHandlerKey = L"Software\\Classes\\*\\shellex\\ContextMenuHandlers\\FileDater";
 	lStatus = RegCreateKeyEx(HKEY_LOCAL_MACHINE, lpHandlerKey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hkHandler, NULL);
-	if (lStatus != ERROR_SUCCESS) {
+	if (lStatus != ERROR_SUCCESS)
 		return E_UNEXPECTED;
-	}
 
 	/* Set value for InProcServer32 default subkey */
 	const wchar_t * wszGUIDString = lpGUIDString.c_str();
 	lStatus = RegSetValueEx(hkHandler, NULL, 0, REG_SZ, (BYTE*)wszGUIDString, wcslenb(wszGUIDString));
-	if (lStatus != ERROR_SUCCESS) {
+	if (lStatus != ERROR_SUCCESS)
 		return E_UNEXPECTED;
-	}
 
 	/* Close handler key */
 	lStatus = RegCloseKey(hkHandler);
-	if (lStatus != ERROR_SUCCESS) {
+	if (lStatus != ERROR_SUCCESS)
 		return E_UNEXPECTED;
-	}
 
 	SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 
@@ -150,14 +136,12 @@ HRESULT __stdcall DllUnregisterServer() {
 	lpHandlerKey = L"Software\\Classes\\*\\shellex\\ContextMenuHandlers\\"  L"FileDater";
 
 	lStatus = RegDeleteTree(HKEY_LOCAL_MACHINE, lpGUIDKey.c_str());
-	if (lStatus != ERROR_SUCCESS) {
+	if (lStatus != ERROR_SUCCESS)
 		return E_UNEXPECTED;
-	}
 
 	lStatus = RegDeleteTree(HKEY_LOCAL_MACHINE, lpHandlerKey.c_str());
-	if (lStatus != ERROR_SUCCESS) {
+	if (lStatus != ERROR_SUCCESS)
 		return E_UNEXPECTED;
-	}
 
 	SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 	return S_OK;

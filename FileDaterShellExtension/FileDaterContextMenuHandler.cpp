@@ -19,9 +19,7 @@ ULONG FileDaterContextMenuHandler::Release() {
 	ULONG iValue;
 	iValue = InterlockedDecrement(&m_dwRefCount);
 	if (iValue < 1)
-	{
 		delete this;
-	}
 	return iValue;
 }
 
@@ -46,9 +44,8 @@ HRESULT FileDaterContextMenuHandler::QueryInterface(REFIID riid, void **ppvObjec
 		this->AddRef();
 		return S_OK;
 	}
-	else {
+	else
 		return E_NOINTERFACE;
-	}
 }
 
 HRESULT FileDaterContextMenuHandler::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject *pdtobj, HKEY hkeyProgID)
@@ -124,9 +121,8 @@ HRESULT FileDaterContextMenuHandler::QueryContextMenu(HMENU hmenu, UINT indexMen
 	miiRename.wID = idCmdFirst;
 	miiRename.dwTypeData = wszRenameLabel;
 
-	if (!InsertMenuItem(hmenu, 0, TRUE, &miiRename)) {
+	if (!InsertMenuItem(hmenu, 0, TRUE, &miiRename))
 		return HRESULT_FROM_WIN32(GetLastError());
-	}
 
 	StringCbPrintf(wszCopyLabel, sizeof(wszCopyLabel), L"Copy to \"%s\"", m_objFileDater->m_wszDstName);
 	miiCopy.cbSize = sizeof(MENUITEMINFO);
@@ -134,9 +130,8 @@ HRESULT FileDaterContextMenuHandler::QueryContextMenu(HMENU hmenu, UINT indexMen
 	miiCopy.wID = idCmdFirst + 1;
 	miiCopy.dwTypeData = wszCopyLabel;
 
-	if (!InsertMenuItem(hmenu, 1, TRUE, &miiCopy)) {
+	if (!InsertMenuItem(hmenu, 1, TRUE, &miiCopy))
 		return HRESULT_FROM_WIN32(GetLastError());
-	}
 
 	return MAKE_HRESULT(SEVERITY_SUCCESS, 0, 2);
 }

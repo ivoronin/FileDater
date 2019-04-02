@@ -17,9 +17,7 @@ ULONG FileDaterClassFactory::Release() {
 	ULONG iValue;
 	iValue = InterlockedDecrement(&m_dwRefCount);
 	if (iValue < 1)
-	{
 		delete this;
-	}
 	return iValue;
 }
 
@@ -39,9 +37,8 @@ HRESULT FileDaterClassFactory::QueryInterface(REFIID riid, void **ppvObject) {
 		this->AddRef();
 		return S_OK;
 	}
-	else {
+	else
 		return E_NOINTERFACE;
-	}
 }
 
 HRESULT FileDaterClassFactory::CreateInstance(IUnknown *pUnkOuter, REFIID riid, void **ppvObject)
@@ -57,15 +54,13 @@ HRESULT FileDaterClassFactory::CreateInstance(IUnknown *pUnkOuter, REFIID riid, 
 
 	if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IContextMenu)) {
 		pHandler = new FileDaterContextMenuHandler();
-		if (pHandler == NULL) {
+		if (pHandler == NULL)
 			return E_OUTOFMEMORY;
-		}
 		hResult = pHandler->QueryInterface(riid, ppvObject);
 		pHandler->Release();
 	}
-	else {
+	else
 		hResult = E_NOINTERFACE;
-	}
 
 	return hResult;
 }

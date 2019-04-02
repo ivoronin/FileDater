@@ -97,9 +97,8 @@ HRESULT FileDater::Stamp(BOOL rename)
 						hr = pfo->MoveItem(psiSrc, psiDstDir, m_wszDstName, NULL);
 					else
 						hr = pfo->CopyItem(psiSrc, psiDstDir, m_wszDstName, NULL);
-					if (SUCCEEDED(hr)) {
+					if (SUCCEEDED(hr))
 						hr = pfo->PerformOperations();
-					}
 					psiDstDir->Release();
 				}
 				psiSrc->Release();
