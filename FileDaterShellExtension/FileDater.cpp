@@ -51,13 +51,8 @@ FileDater::FileDater(wchar_t * wszPathname)
 	if (wcscpy_s(m_wszSrcPathname, _MAX_PATH, wszPathname) != 0)
 		throw std::runtime_error("wcscpy_s(m_wszSrcPathname, wszPathname) error");
 
-	OutputDebugString(L"HERE");
-	OutputDebugString(m_wszSrcPathname);
-
 	if (_wsplitpath_s(m_wszSrcPathname, wszDrive, _countof(wszDrive), wszDir, _countof(wszDir), wszFname, _countof(wszFname), wszExt, _countof(wszExt)) != 0)
 		throw std::runtime_error("_wsplitpath_s(wszPathname) error");
-
-	OutputDebugString(wszFname);
 
 	if (wcslen(wszFname) == 0)
 		throw std::runtime_error("wszFname is empty");
@@ -73,11 +68,7 @@ FileDater::FileDater(wchar_t * wszPathname)
 			throw std::runtime_error("wcscpy_s(wszBname, wszFname) error");
 	}
 
-	OutputDebugString(wszBname);
-
 	StringCbPrintf(wszNewFname, _MAX_FNAME, L"%s %s-%02d", wszBname, wszNewDate, iNewVersion);
-
-	OutputDebugString(wszNewFname);
 
 	if(_wmakepath_s(m_wszDstName, _MAX_FNAME, NULL, NULL, wszNewFname, wszExt) != 0)
 		throw std::runtime_error("_wmakepath_s(m_wszDstName) error");
