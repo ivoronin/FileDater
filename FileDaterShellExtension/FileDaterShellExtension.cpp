@@ -19,6 +19,11 @@ std::wstring GetShellExtensionGUIDString() {
 	return std::wstring(guidString);
 }
 
+/* Return size of a wide-character string in bytes */
+DWORD wcslenb(const wchar_t * wszString) {
+	return (DWORD)(wcslen(wszString) + 1) * sizeof(wchar_t);
+}
+
 HRESULT __stdcall DllCanUnloadNow() {
 	if (g_cObjCount > 0)
 		return S_FALSE;
@@ -94,13 +99,13 @@ HRESULT __stdcall DllRegisterServer() {
 	}
 
 	/* Set value for InProcServer32 default subkey */
-	lStatus = RegSetValueEx(hkInprocServer32, NULL, 0, REG_SZ, (BYTE*)&dllPath, (DWORD)(wcslen(dllPath) * sizeof(wchar_t)));
+	lStatus = RegSetValueEx(hkInprocServer32, NULL, 0, REG_SZ, (BYTE*)&dllPath, wcslenb(dllPath));
 	if (lStatus != ERROR_SUCCESS) {
 		return E_UNEXPECTED;
 	}
 
 	/* Set value for InProcServer32 ThreadingModel subkey */
-	lStatus = RegSetValueEx(hkInprocServer32, L"ThreadingModel", 0, REG_SZ, (BYTE*)&apartment, (DWORD)(wcslen(apartment) * sizeof(wchar_t)));
+	lStatus = RegSetValueEx(hkInprocServer32, L"ThreadingModel", 0, REG_SZ, (BYTE*)&apartment, wcslenb(apartment));
 	if (lStatus != ERROR_SUCCESS) {
 		return E_UNEXPECTED;
 	}
@@ -119,7 +124,8 @@ HRESULT __stdcall DllRegisterServer() {
 	}
 
 	/* Set value for InProcServer32 default subkey */
-	lStatus = RegSetValueEx(hkHandler, NULL, 0, REG_SZ, (BYTE*)lpGUIDString.c_str(), (DWORD)(lpGUIDString.length() * sizeof(wchar_t)));
+	const wchar_t * wszGUIDString = lpGUIDString.c_str();
+	lStatus = RegSetValueEx(hkHandler, NULL, 0, REG_SZ, (BYTE*)wszGUIDString, wcslenb(wszGUIDString));
 	if (lStatus != ERROR_SUCCESS) {
 		return E_UNEXPECTED;
 	}
