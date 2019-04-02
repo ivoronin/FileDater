@@ -4,7 +4,7 @@
 class FileDaterClassFactory : public IClassFactory
 {
 protected:
-	DWORD m_objRefCount;
+	DWORD m_dwRefCount;
 	~FileDaterClassFactory();
 public:
 	FileDaterClassFactory();

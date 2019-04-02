@@ -9,14 +9,14 @@ UINT g_cObjCount;
 
 std::wstring GetShellExtensionGUIDString() {
 	HRESULT hResult;
-	wchar_t * guidString;
+	wchar_t * wszGUIDString;
 
 	/* Convert GUID to string */
-	hResult = StringFromCLSID(CLSID_FileDaterShellExtension, &guidString);
+	hResult = StringFromCLSID(CLSID_FileDaterShellExtension, &wszGUIDString);
 	if (hResult != S_OK) {
 		return NULL;
 	}
-	return std::wstring(guidString);
+	return std::wstring(wszGUIDString);
 }
 
 /* Return size of a wide-character string in bytes */
@@ -60,7 +60,7 @@ HRESULT __stdcall DllRegisterServer() {
 	wchar_t dllPath[MAX_PATH];
 	DWORD length;
 	std::wstring lpGUIDString, lpGUIDKey, lpHandlerKey;
-	wchar_t apartment[] = L"Apartment";
+	wchar_t wszApartment[] = L"Apartment";
 
 	/*
 	 * Prepare data
@@ -105,7 +105,7 @@ HRESULT __stdcall DllRegisterServer() {
 	}
 
 	/* Set value for InProcServer32 ThreadingModel subkey */
-	lStatus = RegSetValueEx(hkInprocServer32, L"ThreadingModel", 0, REG_SZ, (BYTE*)&apartment, wcslenb(apartment));
+	lStatus = RegSetValueEx(hkInprocServer32, L"ThreadingModel", 0, REG_SZ, (BYTE*)&wszApartment, wcslenb(wszApartment));
 	if (lStatus != ERROR_SUCCESS) {
 		return E_UNEXPECTED;
 	}

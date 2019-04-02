@@ -5,19 +5,19 @@
 #include <Shobjidl.h>
 #include "FileDater.h"
 
-UINT ParseFilename(const wchar_t *fname, wchar_t *bname, size_t bsize, wchar_t *date, size_t dsize, UINT *version) {
+UINT ParseFilename(const wchar_t *wszFname, wchar_t *wszBname, size_t cBnameSize, wchar_t *wszDate, size_t cDateSize, UINT *iVersion) {
 	std::wregex pattern(L"^([^\\.]+?)(?:\\s(\\d{6})-(\\d{2}))$");
 	std::wcmatch results;
 
-	if (nullptr == fname || nullptr == bname || nullptr == date || nullptr == version)
+	if (nullptr == wszFname || nullptr == wszBname || nullptr == wszDate || nullptr == iVersion)
 		throw std::invalid_argument("nullptr passed");
 
-	if (std::regex_search(fname, results, pattern)) {
-		if (wcscpy_s(bname, bsize, results[1].str().c_str()) != 0)
-			throw std::runtime_error("wcscpy_s(bname, results) error");
-		if (wcscpy_s(date, dsize, results[2].str().c_str()) != 0)
-			throw std::runtime_error("wcscpy_s(date, results) error");
-		*version = _wtoi(results[3].str().c_str());
+	if (std::regex_search(wszFname, results, pattern)) {
+		if (wcscpy_s(wszBname, cBnameSize, results[1].str().c_str()) != 0)
+			throw std::runtime_error("wcscpy_s(wszBname, results) error");
+		if (wcscpy_s(wszDate, cDateSize, results[2].str().c_str()) != 0)
+			throw std::runtime_error("wcscpy_s(wszDate, results) error");
+		*iVersion = _wtoi(results[3].str().c_str());
 		if (errno != NOERROR)
 			throw std::runtime_error("_wtoi(results) error");
 		return 0;
@@ -25,7 +25,7 @@ UINT ParseFilename(const wchar_t *fname, wchar_t *bname, size_t bsize, wchar_t *
 	return 1;
 }
 
-void PutCurrentDate(wchar_t * date, size_t dsize) {
+void PutCurrentDate(wchar_t * wszDate, size_t cDateSize) {
 	time_t tTime;
 	struct tm tmTime;
 
@@ -34,57 +34,57 @@ void PutCurrentDate(wchar_t * date, size_t dsize) {
 		throw std::runtime_error("time() error");
 	if (localtime_s(&tmTime, &tTime) != 0)
 		throw std::runtime_error("localtime_s() error");
-	if (wcsftime(date, dsize, L"%d%m%y", &tmTime) == 0)
+	if (wcsftime(wszDate, cDateSize, L"%d%m%y", &tmTime) == 0)
 		throw std::runtime_error("wcsftime() error");
 }
 
 #define _MAX_DATE 16
-FileDater::FileDater(wchar_t * szPathname)
+FileDater::FileDater(wchar_t * wszPathname)
 {
-	wchar_t drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
-	wchar_t bname[_MAX_PATH], date[_MAX_DATE];
-	UINT version;
-	wchar_t new_date[_MAX_DATE] = L"";
-	wchar_t new_fname[_MAX_PATH];
-	UINT new_version = 1;
+	wchar_t wszDrive[_MAX_DRIVE], wszDir[_MAX_DIR], wszFname[_MAX_FNAME], wszExt[_MAX_EXT];
+	wchar_t wszBname[_MAX_PATH], wszDate[_MAX_DATE];
+	UINT iVersion;
+	wchar_t wszNewDate[_MAX_DATE] = L"";
+	wchar_t wszNewFname[_MAX_PATH];
+	UINT iNewVersion = 1;
 
-	if (wcscpy_s(m_szSrcPathname, _MAX_PATH, szPathname) != 0)
-		throw std::runtime_error("wcscpy_s(m_szSrcPathname,szPathname) error");
+	if (wcscpy_s(m_wszSrcPathname, _MAX_PATH, wszPathname) != 0)
+		throw std::runtime_error("wcscpy_s(m_wszSrcPathname, wszPathname) error");
 
 	OutputDebugString(L"HERE");
-	OutputDebugString(m_szSrcPathname);
+	OutputDebugString(m_wszSrcPathname);
 
-	if (_wsplitpath_s(m_szSrcPathname, drive, _countof(drive), dir, _countof(dir), fname, _countof(fname), ext, _countof(ext)) != 0)
-		throw std::runtime_error("_wsplitpath_s(szPathname) error");
+	if (_wsplitpath_s(m_wszSrcPathname, wszDrive, _countof(wszDrive), wszDir, _countof(wszDir), wszFname, _countof(wszFname), wszExt, _countof(wszExt)) != 0)
+		throw std::runtime_error("_wsplitpath_s(wszPathname) error");
 
-	OutputDebugString(fname);
+	OutputDebugString(wszFname);
 
-	if (wcslen(fname) == 0)
-		throw std::runtime_error("fname is empty");
+	if (wcslen(wszFname) == 0)
+		throw std::runtime_error("wszFname is empty");
 
-	PutCurrentDate(new_date, _MAX_DATE);
+	PutCurrentDate(wszNewDate, _MAX_DATE);
 
-	if (ParseFilename(fname, bname, _MAX_PATH, date, _MAX_DATE, &version) == 0) {
-		if (wcscmp(date, new_date) == 0)
-			new_version = version + 1;
+	if (ParseFilename(wszFname, wszBname, _MAX_PATH, wszDate, _MAX_DATE, &iVersion) == 0) {
+		if (wcscmp(wszDate, wszNewDate) == 0)
+			iNewVersion = iVersion + 1;
 	}
 	else {
-		if (wcscpy_s(bname, _MAX_PATH, fname) != 0)
-			throw std::runtime_error("wcscpy_s(bname, fname) error");
+		if (wcscpy_s(wszBname, _MAX_PATH, wszFname) != 0)
+			throw std::runtime_error("wcscpy_s(wszBname, wszFname) error");
 	}
 
-	OutputDebugString(bname);
+	OutputDebugString(wszBname);
 
-	StringCbPrintf(new_fname, _MAX_FNAME, L"%s %s-%02d", bname, new_date, new_version);
+	StringCbPrintf(wszNewFname, _MAX_FNAME, L"%s %s-%02d", wszBname, wszNewDate, iNewVersion);
 
-	OutputDebugString(new_fname);
+	OutputDebugString(wszNewFname);
 
-	if(_wmakepath_s(m_szDstName, _MAX_FNAME, NULL, NULL, new_fname, ext) != 0)
-		throw std::runtime_error("_wmakepath_s(m_szDstName) error");
-	if(_wmakepath_s(m_szDstDir, _MAX_DIR, drive, dir, NULL, NULL) != 0)
-		throw std::runtime_error("_wmakepath_s(m_szDstDir) error");
-	if(_wmakepath_s(m_szDstPathname, _MAX_PATH, drive, dir, new_fname, ext) != 0)
-		throw std::runtime_error("_wmakepath_s(m_szDstPathname) error");
+	if(_wmakepath_s(m_wszDstName, _MAX_FNAME, NULL, NULL, wszNewFname, wszExt) != 0)
+		throw std::runtime_error("_wmakepath_s(m_wszDstName) error");
+	if(_wmakepath_s(m_wszDstDir, _MAX_DIR, wszDrive, wszDir, NULL, NULL) != 0)
+		throw std::runtime_error("_wmakepath_s(m_wszDstDir) error");
+	if(_wmakepath_s(m_wszDstPathname, _MAX_PATH, wszDrive, wszDir, wszNewFname, wszExt) != 0)
+		throw std::runtime_error("_wmakepath_s(m_wszDstPathname) error");
 }
 
 HRESULT FileDater::Stamp(BOOL rename)
@@ -98,14 +98,14 @@ HRESULT FileDater::Stamp(BOOL rename)
 	if (SUCCEEDED(hr)) {
 		hr = CoCreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pfo));
 		if (SUCCEEDED(hr)) {
-			hr = SHCreateItemFromParsingName(m_szSrcPathname, NULL, IID_PPV_ARGS(&psiSrc));
+			hr = SHCreateItemFromParsingName(m_wszSrcPathname, NULL, IID_PPV_ARGS(&psiSrc));
 			if (SUCCEEDED(hr)) {
-				hr = SHCreateItemFromParsingName(m_szDstDir, NULL, IID_PPV_ARGS(&psiDstDir));
+				hr = SHCreateItemFromParsingName(m_wszDstDir, NULL, IID_PPV_ARGS(&psiDstDir));
 				if (SUCCEEDED(hr)) {
 					if (rename)
-						hr = pfo->MoveItem(psiSrc, psiDstDir, m_szDstName, NULL);
+						hr = pfo->MoveItem(psiSrc, psiDstDir, m_wszDstName, NULL);
 					else
-						hr = pfo->CopyItem(psiSrc, psiDstDir, m_szDstName, NULL);
+						hr = pfo->CopyItem(psiSrc, psiDstDir, m_wszDstName, NULL);
 					if (SUCCEEDED(hr)) {
 						hr = pfo->PerformOperations();
 					}

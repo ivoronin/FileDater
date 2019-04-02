@@ -6,9 +6,9 @@
 class FileDaterContextMenuHandler : public IShellExtInit, IContextMenu
 {
 private:
-	FileDater *m_fileDater;
+	FileDater *m_objFileDater;
 protected:
-	DWORD m_objRefCount;
+	DWORD m_dwRefCount;
 	~FileDaterContextMenuHandler();
 public:
 	FileDaterContextMenuHandler();

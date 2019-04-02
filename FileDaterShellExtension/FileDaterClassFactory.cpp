@@ -4,23 +4,23 @@
 #include "FileDaterShellExtension.h"
 #include "FileDaterContextMenuHandler.h"
 
-FileDaterClassFactory::FileDaterClassFactory() : m_objRefCount(1)
+FileDaterClassFactory::FileDaterClassFactory() : m_dwRefCount(1)
 {
 	InterlockedIncrement(&g_cObjCount);
 }
 
 ULONG FileDaterClassFactory::AddRef() {
-	return InterlockedIncrement(&m_objRefCount);
+	return InterlockedIncrement(&m_dwRefCount);
 }
 
 ULONG FileDaterClassFactory::Release() {
-	ULONG value;
-	value = InterlockedDecrement(&m_objRefCount);
-	if (value < 1)
+	ULONG iValue;
+	iValue = InterlockedDecrement(&m_dwRefCount);
+	if (iValue < 1)
 	{
 		delete this;
 	}
-	return value;
+	return iValue;
 }
 
 HRESULT FileDaterClassFactory::QueryInterface(REFIID riid, void **ppvObject) {
